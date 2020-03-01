@@ -41,6 +41,8 @@ class DelegateTestCaseTests: XCTestCase {
         let calculator = Calculator()
         let testDelegate = TestCalculatorDelegate()
         calculator.delegate = testDelegate
+        calculatorTestExpectation.expectedFulfillmentCount = 2
+        self.updateFileAndLine(test: { calculator.delegatedSum(x: 1, y: 2) } )
         self.updateFileAndLine(test: { calculator.delegatedSum(x: 1, y: 2) } )
         
         class TestCalculatorDelegate: TestBaseCalculatorDelegate {
