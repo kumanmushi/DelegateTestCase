@@ -41,8 +41,8 @@ class DelegateTestCaseTests: XCTestCase {
         calculator.delegate = testDelegate
         calculator.delegatedSum(x: 1, y: 2)
         
-        class TestCalculatorDelegate: CalculatorDelegate {
-            func summed(result: Int) {
+        class TestCalculatorDelegate: TestBaseCalculatorDelegate {
+            override func summed(result: Int) {
                 calculatorTestExpectation.fulfill()
                 XCTAssertEqual(result, 3)
             }
@@ -74,4 +74,10 @@ class Calculator {
 
 protocol CalculatorDelegate: AnyObject {
     func summed(result: Int)
+    func multiplied(result: Int)
+}
+
+class TestBaseCalculatorDelegate: CalculatorDelegate {
+    func summed(result: Int) { XCTFail("called \(#function)") }
+    func multiplied(result: Int) { XCTFail("called \(#function)") }
 }
