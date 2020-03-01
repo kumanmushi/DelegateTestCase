@@ -9,7 +9,9 @@
 import XCTest
 @testable import DelegateTestCase
 
-var calculatorTestExpectation: XCTestExpectation!
+private var calculatorTestExpectation: XCTestExpectation!
+private var testingFile: StaticString!
+private var testingLine: UInt!
 
 class DelegateTestCaseTests: XCTestCase {
     override func setUp() {
@@ -39,16 +41,22 @@ class DelegateTestCaseTests: XCTestCase {
         let calculator = Calculator()
         let testDelegate = TestCalculatorDelegate()
         calculator.delegate = testDelegate
-        calculator.delegatedSum(x: 1, y: 2)
+        self.updateFileAndLine(test: { calculator.delegatedSum(x: 1, y: 2) } )
         
         class TestCalculatorDelegate: TestBaseCalculatorDelegate {
             override func summed(result: Int) {
                 calculatorTestExpectation.fulfill()
-                XCTAssertEqual(result, 3)
+                XCTAssertEqual(result, 3, file: testingFile, line: testingLine)
             }
         }
         
         self.wait(for: [calculatorTestExpectation], timeout: 2)
+    }
+    
+    private func updateFileAndLine(test: () -> Void, file: StaticString = #file, line: UInt = #line) {
+        testingFile = file
+        testingLine = line
+        test()
     }
 }
 
@@ -78,6 +86,6 @@ protocol CalculatorDelegate: AnyObject {
 }
 
 class TestBaseCalculatorDelegate: CalculatorDelegate {
-    func summed(result: Int) { XCTFail("called \(#function)") }
-    func multiplied(result: Int) { XCTFail("called \(#function)") }
+    func summed(result: Int) { XCTFail("called \(#function)", file: testingFile, line: testingLine) }
+    func multiplied(result: Int) { XCTFail("called \(#function)", file: testingFile, line: testingLine) }
 }
